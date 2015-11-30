@@ -179,7 +179,7 @@ for j in range(0, params['stock_count']):
     file = os.path.splitext(currentFile)[0]
 
     dimension = np.array([len(outputDataFrame), len(outputDataFrame.columns)])
-    smallDimension = np.array(['small_output_size', len(outputDataFrame.columns)])
+    smallDimension = np.array([params['small_output_size'], len(outputDataFrame.columns)])
 
     print("dimensions for: ", currentFile)
     print("number of rows:", len(outputDataFrame))
