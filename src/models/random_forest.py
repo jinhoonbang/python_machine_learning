@@ -12,12 +12,12 @@ from sklearn.decomposition import PCA
 #np.set_printoptions(edgeitems=30)
 
 params = dict(
-    path = glob.glob('data/smallHybrid/*'),
-    n_row = 50000,
+    path = glob.glob('../../../../data/smallHybrid/*'),
+    n_row = 500,
     frac_train = 0.8, # fraction of dataset used for train. 1 - frac_train is used for test.
     n_symbol = 43,
     feature_reduction = None, # No. features after PCA. Change this value to an int value to conduct PCA on feature set.
-    n_estimator = 30, # No. estimators for RandomForestClassifier
+    n_estimator = 10, # No. estimators for RandomForestClassifier
     criterion = 'entropy'
 )
 
@@ -33,6 +33,7 @@ def load_data(file_path):
     files = []
     for file in file_path:
         files.append(file)
+        print(file)
     files.sort()
 
     #dataframe for appending labels and features from all .bin files
@@ -75,8 +76,8 @@ def train_test_split(x, y):
     '''
 
     splitIndex=math.floor(params['frac_train']*params['n_row'])
-    y_test = y[splitIndex:].as_matrix()
-    y_train = y[:splitIndex].as_matrix()
+    y_test = y[splitIndex:]
+    y_train = y[:splitIndex]
     x_test = x[splitIndex:]
     x_train = x[:splitIndex]
 

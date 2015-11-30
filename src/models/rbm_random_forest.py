@@ -14,10 +14,10 @@ np.set_printoptions(edgeitems=30)
 
 params = dict(
     path = os.path.join(os.path.expanduser('~'), 'data', 'smallHybrid', '*'),
-    n_row = 50000,
-    batchsize = 100,
+    n_row = 500,
+    batchsize = 10,
     learning_rate = 0.001,
-    n_iter = 30,
+    n_iter = 10,
     frac_train = 0.75,
     n_symbol = 43,
     reduced_feature = 500

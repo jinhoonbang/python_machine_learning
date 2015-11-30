@@ -23,7 +23,7 @@ import random
 pd.set_option('precision', 15)
 
 params = dict(
-    path = glob.glob('../../../data/csv/*'),
+    path = os.path.join(os.path.expanduser('~'), 'data', 'csv', '*'),
     min_lagging = 1,
     max_lagging = 100,
     #interval_lagging = 1, #not implemented
@@ -39,7 +39,7 @@ params = dict(
 
 #get paths to all files in 'file_path'
 input_files = []
-for file in params['path']:
+for file in glob.glob(params['path']):
     input_files.append(file)
 input_files.sort()
 
