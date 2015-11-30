@@ -29,30 +29,21 @@ params = dict(
     stock_count = 43,
     small_output_size = 50000,
 )
-print("PARAMETERS")
-print(params)
 
-# #set log file
-# log = open('../log/add_feature_hybrid.log','w')
-# sys.stdout = log
-
-#append all input files in 'path'
+#get paths to all files in 'file_path'
 input_files = []
 for file in params['path']:
     input_files.append(file)
 input_files.sort()
 
 #find the symbol with the lowest number of datapoints
-#because the length of the output file is limited by the symbol with the lowest number of datapoints.
-temp_df = pd.read_csv(input_files[0], header=None, dtype='float64')
-min_size = len(temp_df.index)
+#number of datapoints in the output is limited by the symbol with the lowest number of datapoints.
+list_n = []
 for file in input_files:
     df = pd.read_csv(file, header=None, dtype='float64')
-    if (len(df.index) < min_size):
-        min_size = len(df.index)
-
-print("min_size: ",min_size)
-print("")
+    list_n.append(len(df))
+min_n = min(list_n)
+print("min_n:", min_n)
 
 #dataframes for accumulating normalized price and return price across all symbols
 df_normalized = pd.DataFrame(dtype='float64')
@@ -60,12 +51,12 @@ df_return = pd.DataFrame(dtype='float64')
 
 for file in input_files:
     df = pd.read_csv(file, names=['Timestamp', 'Price'], header=None, dtype='float64')
-    df = df.ix[:min_size]
+    df = df.ix[:min_n]
     series_price = df.Price
     series_return = pd.Series(index = df.index, name="Return"+file, dtype='float64')
 
 #generate return price
-    for i in range(0, min_size - 1):
+    for i in range(0, min_n - 1):
         series_return[i] = (series_price[i+1]-series_price[i])/series_price[i]
     series_return = series_return.dropna()
     df_return = pd.concat([df_return, series_return], axis=1)
@@ -75,7 +66,7 @@ for file in input_files:
 
     series_normalized = pd.Series(index=series_price.index, name="PriceNormalized"+file, dtype='float64')
 
-    for i in range(0, min_size):
+    for i in range(0, min_n):
         series_normalized[i] = (series_price[i]-meanPrice)/stdPrice
     df_normalized = pd.concat([df_normalized, series_normalized], axis=1)
 
@@ -94,7 +85,7 @@ for j in range(0, params['stock_count']):
         positive = 0
         neutral = 0
         negative = 0
-        for i in range (0, min_size-1):
+        for i in range (0, min_n-1):
             difference = currNormalized[i+1]-currNormalized[i]
             if (difference>eps):
                 positive = positive + 1
@@ -116,7 +107,7 @@ for j in range(0, params['stock_count']):
     print("")
 
     seriesLabel = pd.Series(index=currNormalized.index, name="Label"+str(balEpsilon)+currentFile, dtype='float64')
-    for i in range (0, min_size-1):
+    for i in range (0, min_n-1):
         difference = currNormalized[i+1]-currNormalized[i]
         if (difference>balEpsilon):
             seriesLabel[i]=1
@@ -152,7 +143,7 @@ for j in range(0, params['stock_count']):
 
         seriesCorrelation = pd.Series(index=outputDataFrame.index, name="Correlation"+currentFile+" VS "+compareFile, dtype='float64')
 
-        for i in range(params['max_correlation_window'], min_size):
+        for i in range(params['max_correlation_window'], min_n):
             correlation = np.corrcoef(xPrice[i-(params['max_correlation_window'] - 1) : i], yPrice[i-(params['max_correlation_window'] - 1) : i], bias = 1)[0][1]
             seriesCorrelation[i] = correlation
 
@@ -184,7 +175,6 @@ for j in range(0, params['stock_count']):
     # outputDataFrame.to_csv(file+'_largeHybrid.csv',index=False)
     # smallDataFrame.to_csv(file+'_smallHybrid.csv',index=False)
 
-# log.close()
 
 
 
