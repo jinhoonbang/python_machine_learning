@@ -1,5 +1,7 @@
 __author__ = 'JinHoon'
 
+__author__ = 'JinHoon'
+
 import sys
 import glob
 import pandas as pd
@@ -8,6 +10,8 @@ import math
 import time
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.neural_network import BernoulliRBM
+from sklearn.metrics import f1_score, classification_report
+from sklearn.ensemble import RandomForestClassifier
 import os
 
 np.set_printoptions(edgeitems=30)
@@ -20,7 +24,9 @@ params = dict(
     n_iter = 10,
     frac_train = 0.75,
     n_symbol = 43,
-    reduced_feature = 500
+    reduced_feature = 500,
+    n_estimator = 10,
+    criterion = 'entropy'
 )
 
 def load_data(file_path):
@@ -55,6 +61,80 @@ def load_data(file_path):
 
     return label, feature
 
+def train_test_split(x, y):
+    '''
+    split x and y into x_train, x_test, y_train, y_test
+
+    :param x: numpy ndarray
+    :param y: numpy ndarray
+    :return: x_train, x_test, y_train, y_test
+    '''
+
+    splitIndex=math.floor(params['frac_train']*params['n_row'])
+    y_test = y[splitIndex:]
+    y_train = y[:splitIndex]
+    x_test = x[splitIndex:]
+    x_train = x[:splitIndex]
+
+    print("DIMENSIONS")
+    print("x_test", x_test.shape)
+    print("x_train", x_train.shape)
+    print("y_test",y_test.shape)
+    print("y_train", y_train.shape)
+
+    return x_train, x_test, y_train, y_test
+
+def print_f1_score(y_test, y_pred):
+    y_pred = y_pred.ravel()
+    y_test = y_test.ravel()
+
+    #Total f1score
+    print("macro", f1_score(y_test, y_pred, average='macro'))
+    print("micro", f1_score(y_test, y_pred, average='micro'))
+    print("weighted", f1_score(y_test, y_pred, average='weighted'))
+    print(classification_report(y_test, y_pred))
+
+def classification_error(y_test, y_pred):
+    y_test = y_test.ravel()
+    y_pred = y_pred.ravel()
+    total = np.size(y_test)
+    assert total == np.size(y_pred)
+    correct = 0
+
+    for i in range(0, total):
+        if y_test[i] == y_pred[i]:
+            correct += 1
+
+    print("Classification error")
+    print("correct:", correct)
+    print("total:", total)
+    print(correct / total)
+
+
+
+def random_forest(x_train, x_test, y_train):
+    '''
+
+    :param x_train: numpy ndarray
+    :param x_test: numpy ndarray
+    :param y_train: numpy ndarray
+    :param y_test: numpy ndarray
+    :return: y_pred (numpy ndarray)
+    '''
+    start_time = time.time()
+
+    rf = RandomForestClassifier(max_features='auto', n_estimators=params['n_estimator'], n_jobs=-1, criterion=params['criterion'])
+
+    rf.fit(x_train, y_train)
+
+    print('Random Forest fit time:')
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    y_pred = rf.predict(x_test)
+
+    return y_pred
+
+
 label, feature = load_data(params['path'])
 
 #scales values in features so that they range from 0 to 1
@@ -78,16 +158,10 @@ print("Dimensions after RBM")
 print("label", label.shape)
 print("feature", feature.shape)
 
-combined = np.concatenate((label,feature), axis=1)
-
-#resulting dataset after RBM is exported in binary format
-#dimensions (n_rows, n_columns) are added to the beginning of the binary file.
-dimension = combined.shape
-print("Dimension of combined")
-print(dimension)
-combined = np.append(dimension, combined)
-combined.astype('float64')
-combined.tofile('RBM.bin')
+x_train, x_test, y_train, y_test = train_test_split(feature, label)
+y_pred = random_forest(x_train, x_test, y_train)
+print_f1_score(y_test, y_pred)
+classification_error(y_test, y_pred)
 
 
 
