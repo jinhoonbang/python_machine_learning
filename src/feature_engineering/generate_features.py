@@ -1,9 +1,16 @@
 __author__ = 'JinHoon'
 
-# Given time series data in (M x 2) CSV format, this script generates label (-1, 0, 1) and features
-# (lagging price, moving averages, correlation)
-# In the input file, the first column is time stamp and the second oolumn is price.
-# In the current path, there are 43 symbols (43 different time series data)
+'''
+ Given time series data in (M x 2) CSV format, this script generates label (-1, 0, 1) and features
+(lagging price, moving averages, correlation)
+In the input file, the first column is time stamp and the second oolumn is price.
+In the current path, there are 43 symbols (43 different time series data)
+Two files per symbol are generated: *_large.bin and *_small.bin. The two files differ
+by number of rows.
+For lagging and moving averages, normalized price values are used.
+For calculating correlation between each symbol, return price value is used.
+
+'''
 
 import pandas as pd
 import glob
@@ -19,10 +26,10 @@ params = dict(
     path = glob.glob('../../../data/csv/*'),
     min_lagging = 1,
     max_lagging = 100,
-    interval_lagging = 1,
+    #interval_lagging = 1, #not implemented
     min_moving_average = 2,
     max_moving_average = 100,
-    interval_moving_average = 1,
+    #interval_moving_average = 1, #not implemented
     list_epsilon = [0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001,0.00000001],
     theta = 0.001,
     max_correlation_window = 100,
@@ -55,12 +62,13 @@ for file in input_files:
     series_price = df.Price
     series_return = pd.Series(index = df.index, name="Return"+file, dtype='float64')
 
-#generate return price
+    #generate return price
     for i in range(0, min_n - 1):
         series_return[i] = (series_price[i+1]-series_price[i])/series_price[i]
     series_return = series_return.dropna()
     df_return = pd.concat([df_return, series_return], axis=1)
 
+    #generate normalized price
     meanPrice = np.mean(series_price)
     stdPrice = np.std(series_price)
 
@@ -81,6 +89,12 @@ for j in range(0, params['stock_count']):
     currentFile = input_files[j]
 
     diffSquared = []
+    #label = 1 and -1 represent increase/decrease in price. If the difference is
+    #lower than epsilon, then label =0
+    #In order to balance the labels as much as possible, different values of
+    #epsilon are experimented and the one that balances the three classes as equally
+    #as possible is chosen
+
     for eps in params['list_epsilon']:
         positive = 0
         neutral = 0
@@ -118,15 +132,21 @@ for j in range(0, params['stock_count']):
 
     outputDataFrame=pd.concat([outputDataFrame, seriesLabel],axis=1)
 
+    #generates lagging columns using normalized price,
     for i in range(1,params['max_lagging']+1):
         seriesLagged = pd.Series(currNormalized.shift(i), index=currNormalized.index, name="Lagging "+str(i)+currentFile, dtype='float64')
         outputDataFrame=pd.concat([outputDataFrame,seriesLagged],axis=1)
 
+    #generates moving averages normalized price
     for i in range (params['min_moving_average'], params['max_moving_average']+1):
         seriesMovingAverage = currNormalized
         seriesMovingAverage = pd.rolling_mean(seriesMovingAverage, i)
         seriesMovingAverage = pd.Series(seriesMovingAverage, index=seriesMovingAverage.index, name="Moving Average"+str(i)+currentFile, dtype='float64')
         outputDataFrame = pd.concat([outputDataFrame, seriesMovingAverage], axis=1)
+
+    #calculates correlation with different symbols using moving windows.
+    #adds very small values of perturbation to avoid division by zero while
+    #calculating correlation.
 
     for k in range (j+1, params['stock_count']):
         u = (params['theta'] * balEpsilon)/math.sqrt(params['max_correlation_window'])
@@ -149,6 +169,10 @@ for j in range(0, params['stock_count']):
 
         outputDataFrame = pd.concat([outputDataFrame, seriesCorrelation], axis=1)
 
+    #two output files are prepared
+    #size of the ouput is n_min calculated initially
+    #size of small output set is defined in params
+
     outputDataFrame = outputDataFrame.dropna()
     smallDataFrame = outputDataFrame.tail(params['small_output_size'])
 
@@ -162,14 +186,15 @@ for j in range(0, params['stock_count']):
     print("number of columns: ", len(outputDataFrame.columns))
     print("")
 
+    #append dimension (n_row, n_column) to beginning of file and export to binary
     outputArray = outputDataFrame.as_matrix()
     outputArray=np.append(dimension,outputArray)
     outputArray.astype('float64')
-    outputArray.tofile(file+'_largeBinaryHybrid.bin')
+    outputArray.tofile(file+'_large.bin')
     smallOutputArray = smallDataFrame.as_matrix()
     smallOutputArray=np.append(smallDimension,smallOutputArray)
     smallOutputArray.astype('float64')
-    smallOutputArray.tofile(file+'_smallBinaryHybrid.bin')
+    smallOutputArray.tofile(file+'_small.bin')
 
     #for outputting to csv format
     # outputDataFrame.to_csv(file+'_largeHybrid.csv',index=False)
