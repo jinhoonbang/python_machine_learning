@@ -99,7 +99,7 @@ def pca(x):
     pca = PCA(n_components=params['feature_reduction'])
     x = pca.fit_transform(x)
 
-    return pca
+    return x
 
 def random_forest(x_train, x_test, y_train, y_test):
     '''
