@@ -1,7 +1,5 @@
 __author__ = 'JinHoon'
 
-__author__ = 'JinHoon'
-
 import sys
 import glob
 import pandas as pd
@@ -14,20 +12,25 @@ from sklearn.metrics import f1_score, classification_report
 from sklearn.ensemble import RandomForestClassifier
 import os
 
+log = open('../../log/rbm_rf', 'w')
+sys.stdout = log
+
 np.set_printoptions(edgeitems=30)
 
 params = dict(
     path = os.path.join(os.path.expanduser('~'), 'data', 'smallHybrid', '*'),
-    n_row = 500,
+    n_row = 50000,
     batchsize = 10,
     learning_rate = 0.001,
-    n_iter = 10,
+    n_iter = 50,
     frac_train = 0.75,
     n_symbol = 43,
     reduced_feature = 500,
-    n_estimator = 10,
+    n_estimator = 100,
     criterion = 'entropy'
 )
+
+print(params)
 
 def load_data(file_path):
     files = []
@@ -163,7 +166,7 @@ y_pred = random_forest(x_train, x_test, y_train)
 print_f1_score(y_test, y_pred)
 classification_error(y_test, y_pred)
 
-
+log.close()
 
 
 

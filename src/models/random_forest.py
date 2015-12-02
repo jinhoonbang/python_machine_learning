@@ -8,16 +8,18 @@ import time
 from sklearn.metrics import f1_score, classification_report
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import PCA
+import sys
+import os
 
 #np.set_printoptions(edgeitems=30)
 
 params = dict(
-    path = glob.glob('../../../../data/smallHybrid/*'),
-    n_row = 500,
-    frac_train = 0.8, # fraction of dataset used for train. 1 - frac_train is used for test.
+    path = os.path.join(os.path.expanduser('~'), 'data', 'smallHybrid', '*'), 
+    n_row = 50000,
+    frac_train = 0.75, # fraction of dataset used for train. 1 - frac_train is used for test.
     n_symbol = 43,
-    feature_reduction = None, # No. features after PCA. Change this value to an int value to conduct PCA on feature set.
-    n_estimator = 10, # No. estimators for RandomForestClassifier
+    feature_reduction = 500, # No. features after PCA. Change this value to an int value to conduct PCA on feature set.
+    n_estimator = 100, # No. estimators for RandomForestClassifier
     criterion = 'entropy'
 )
 
@@ -31,7 +33,7 @@ def load_data(file_path):
 
     #get paths to all files in 'file_path'
     files = []
-    for file in file_path:
+    for file in glob.glob(file_path):
         files.append(file)
         print(file)
     files.sort()
@@ -131,10 +133,34 @@ def print_f1_score(y_test, y_pred):
     print("weighted", f1_score(y_test, y_pred, average='weighted'))
     print(classification_report(y_test, y_pred))
 
+def classification_error(y_test, y_pred):
+    y_test = y_test.ravel()
+    y_pred = y_pred.ravel()
+    total = np.size(y_test)
+    assert total == np.size(y_pred)
+    correct = 0
+
+    for i in range(0, total):
+        if y_test[i] == y_pred[i]:
+            correct += 1
+
+    print("Classification error")
+    print("correct:", correct)
+    print("total:", total)
+    print(correct / total)
+
+
 if __name__ == "__main__":
+    
+    #log = open('../../log/pca_rf', 'w')
+    #sys.stdout = log
+
     x,y = load_data(params['path'])
     if params['feature_reduction']:
         x = pca(x)
     x_train, x_test, y_train, y_test = train_test_split(x, y)
     y_pred = random_forest(x_train, x_test, y_train, y_test)
     print_f1_score(y_test, y_pred)
+    classification_error(y_test, y_pred) 
+   
+    #log.close()
