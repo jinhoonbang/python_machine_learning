@@ -9,6 +9,7 @@ n_train = 37500 <br/>
 n_test = 12500 <br/>
 time: 126.9m <br/>
 f-score: 0.44 <br/>
+classifcation error:0.46 <br/>
 </p>
 
 <p>
@@ -21,6 +22,7 @@ n = 50000<br/>
 n_train = 37500<br/>
 n_test = 12500<br/>
 f-score: 0.44<br/>
+classification error:0.46<br/>
 *Experimented with different values for n_out, but f-score didn't change significantly
 *Also, experimented with multiple layers of RBM, but f-score still didn't change much
 *Trained for longer time period (n_train = 87500) and tested on same set, but still got similar f-score.
