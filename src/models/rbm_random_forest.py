@@ -1,4 +1,27 @@
-__author__ = 'JinHoon'
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+# Author: Matthew Dixon, Diego Klabjan, Jin Hoon Bang
+# Description: This file first uses RBM to learn from the given features set
+# and conducts Random Forest Classification to make predictions on the provided
+# dataset. load_data should be modified to load desired label (y) and feature (x).
+# x is (M x N) features matrix and y is (M x S), where M is number of data points,
+# N is number of features and S is number of symbols (number of label columns)
+# Note that y can be multi-class.
+# The script provides two metrics: f1-score and classification error.
+
 
 import sys
 import glob
@@ -12,8 +35,8 @@ from sklearn.metrics import f1_score, classification_report
 from sklearn.ensemble import RandomForestClassifier
 import os
 
-log = open('../../log/rbm_rf', 'w')
-sys.stdout = log
+# log = open('../../log/rbm_rf', 'w')
+# sys.stdout = log
 
 np.set_printoptions(edgeitems=30)
 
@@ -166,7 +189,7 @@ y_pred = random_forest(x_train, x_test, y_train)
 print_f1_score(y_test, y_pred)
 classification_error(y_test, y_pred)
 
-log.close()
+# log.close()
 
 
 

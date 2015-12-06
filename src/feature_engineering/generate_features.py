@@ -1,16 +1,28 @@
-__author__ = 'JinHoon'
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+# Author: Matthew Dixon, Diego Klabjan, Jin Hoon Bang
+# Description: Given multiple time series data in (M x 2) CSV format, this script
+# generates label (-1, 0, 1) and features (lagging price, moving averages, correlation)
+# In the input time series data, the first column is time stamp and the second oolumn is price.
+# In the current path, there are 43 symbols (43 different time series data).
+# Two files per symbol are generated: *_large.bin and *_small.bin. The two files differ
+# in number of datapoints that they contain.
+# For lagging and moving averages, normalized price values are used.
+# For calculating correlation between each symbol, return price value is used.
 
-'''
- Given time series data in (M x 2) CSV format, this script generates label (-1, 0, 1) and features
-(lagging price, moving averages, correlation)
-In the input file, the first column is time stamp and the second oolumn is price.
-In the current path, there are 43 symbols (43 different time series data)
-Two files per symbol are generated: *_large.bin and *_small.bin. The two files differ
-by number of rows.
-For lagging and moving averages, normalized price values are used.
-For calculating correlation between each symbol, return price value is used.
-
-'''
 
 import pandas as pd
 import glob

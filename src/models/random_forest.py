@@ -1,4 +1,27 @@
-__author__ = 'JinHoon'
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+# Author: Matthew Dixon, Diego Klabjan, Jin Hoon Bang
+# Description: This file uses Random Forest Classifier from sklearn to
+# train and make predictions. load_data function should be modified.
+# load_data should output two matrices x and y. x is (M x N) features matrix
+# y is (M x S), where M is number of data points, N is number of features
+# and S is number of symbols. Also, y can be multi-class.
+# Also, by setting feature_reduction in params, one can optionally conduct
+# PCA on the features set.
+# The script provides two metrics: f1-score and classification error.
 
 import glob
 import pandas as pd

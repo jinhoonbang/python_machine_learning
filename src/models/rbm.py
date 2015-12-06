@@ -1,4 +1,24 @@
-__author__ = 'JinHoon'
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+# Author: Matthew Dixon, Diego Klabjan, Jin Hoon Bang
+# Description: This file uses RBM to learn from the given features set.
+# load_data should be modified to load desired label and features set.
+# 'batchsize', 'learning_rate', 'n_iter' and 'reduced_features' in params
+# are parameters of RBM.
+
 
 import sys
 import glob
@@ -14,12 +34,10 @@ np.set_printoptions(edgeitems=30)
 
 params = dict(
     path = os.path.join(os.path.expanduser('~'), 'data', 'smallHybrid', '*'),
-    n_row = 500,
+    n_row = 50000,
     batchsize = 10,
     learning_rate = 0.001,
     n_iter = 10,
-    frac_train = 0.75,
-    n_symbol = 43,
     reduced_feature = 500
 )
 
